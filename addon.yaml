@@ -1,0 +1,45 @@
+name: Next Departure
+description: Displays the next departure from Reuß-Park, Gera to Jena-Göschwitz
+
+dependencies:
+  - api_client
+
+start_up:
+  - service: api_client.request
+    data:
+      url: 'https://api.deutschebahn.com/freeplan/v1/departureBoard'
+      params:
+        origin: 'Reuß-Park,Gera'
+        destination: 'Jena-Göschwitz'
+        accessId: 'e7ef6f20ef821854b978e3427818e217'
+      headers:
+        Accept: application/json
+      method: GET
+
+shutdown:
+  - service: api_client.cancel
+    data:
+      request_id: next_departure_request
+
+services:
+  update:
+    description: Update the next departure
+    fields:
+      - name: refresh_interval
+        description: The interval in seconds between updates
+        example: 3600
+        required: false
+        default: 3600
+    service: api_client.request
+    data_template:
+      url: 'https://api.deutschebahn.com/freeplan/v1/departureBoard'
+      params:
+        origin: 'Reuß-Park,Gera'
+        destination: 'Jena-Göschwitz'
+        accessId: 'e7ef6f20ef821854b978e3427818e217'
+      headers:
+        Accept: application/json
+      method: GET
+      request_id: next_departure_request
+      timeout: 10
+      skip_certificate_verify: false
